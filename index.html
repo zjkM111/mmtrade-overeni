@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+</head>
+<body>
+<title>MMTRADE Ověření</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Inter:wght@400;600&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+/* Layout: jedna úzká listina; nahoře ověřovací pole, pod ním výsledek, dole registr otisků. Jediný vzhled: tmavá „bezpečnostní listina“ MMTRADE. */
+:root{
+  --ink:#00050A; --paper:#020B14; --paper2:#03101C; --rule:#16405A; --rule2:#0E2A3A;
+  --fg:#E8F8FF; --fg2:#9CC3D2; --fg3:#5E97AC; --cyan:#00E5FF; --gold:#FFE14D; --ok:#39FF9F; --bad:#FF4D6A;
+  --display:"Fraunces",Georgia,"Times New Roman",serif; --body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{background:var(--ink);color:var(--fg)}
+body{font-family:var(--body);font-size:15px;line-height:1.5;padding-block:28px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.sheet{background:var(--paper);border:1px solid var(--rule);outline:1px solid var(--rule2);outline-offset:5px;padding:22px 22px 20px;position:relative}
+.sheet::before,.sheet::after{content:"";position:absolute;width:18px;height:18px;border:2px solid var(--gold)}
+.sheet::before{left:-2px;top:-2px;border-right:0;border-bottom:0}
+.sheet::after{right:-2px;bottom:-2px;border-left:0;border-top:0}
+.k{font:700 11px/1.3 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--fg3)}
+.k.c{color:var(--cyan)} .k.g{color:var(--gold)}
+h1{font-family:var(--display);font-weight:600;font-size:clamp(28px,6vw,40px);line-height:1.08;margin:8px 0 4px;text-wrap:balance}
+.lead{color:var(--fg2);margin:6px 0 0;max-width:62ch}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px 18px;margin-top:16px;padding-top:14px;border-top:1px solid var(--rule2)}
+.meta div{min-width:0} .meta b{display:block;font:700 14px/1.35 var(--mono);color:var(--fg);margin-top:3px;overflow-wrap:anywhere}
+.drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;border:1.5px dashed var(--cyan);background:var(--paper2);padding:30px 16px;cursor:pointer;min-height:180px}
+.drop:hover,.drop.over{background:#061a2a}
+.drop:focus-within{outline:2px solid var(--cyan);outline-offset:3px}
+.drop strong{font:600 18px/1.3 var(--body);color:var(--fg)}
+.drop span{color:var(--fg2);font-size:14px}
+.drop .btn{color:var(--ink);font-size:13px}
+td.m i{font-style:normal;color:var(--cyan);font-weight:700}
+.btn{display:inline-block;font:700 13px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink);background:var(--cyan);padding:13px 18px;border:0;cursor:pointer}
+input[type=file]{position:absolute;width:1px;height:1px;opacity:0}
+.res{border:1px solid var(--rule);padding:18px;background:var(--paper)}
+.res.ok{border-color:var(--ok)} .res.bad{border-color:var(--bad)}
+.res .v{font:700 20px/1.25 var(--mono);letter-spacing:.04em}
+.res.ok .v{color:var(--ok)} .res.bad .v{color:var(--bad)}
+.res p{color:var(--fg2);margin:8px 0 0}
+.hash{font:400 13px/1.55 var(--mono);color:var(--fg);overflow-wrap:anywhere;margin-top:8px}
+.hash i{font-style:normal;color:var(--cyan);font-weight:700}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:4px}
+.steps div{border-top:1px solid var(--rule);padding-top:10px;min-width:0}
+.steps p{margin:4px 0 0;color:var(--fg2);font-size:14px}
+.tbl{overflow-x:auto;margin-top:10px}
+table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+th{font:700 10.5px/1.2 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--cyan);text-align:left;padding:8px;border-bottom:1px solid var(--rule)}
+td{padding:8px;border-bottom:1px solid var(--rule2);color:var(--fg2);vertical-align:top}
+td.m{font-family:var(--mono);color:var(--fg);font-size:12px;overflow-wrap:anywhere}
+details summary{cursor:pointer;font:700 12px/1.4 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+details summary:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.foot{color:var(--fg3);font-size:13px;text-align:center}
+@media (prefers-reduced-motion:no-preference){.res{animation:in .25s ease-out}@keyframes in{from{transform:translateY(4px)}to{transform:none}}}
+</style>
+
+<main class="wrap">
+  <section class="sheet" aria-labelledby="t">
+    <div class="k g">MMTRADE</div>
+    <h1 id="t">Ověření certifikátu integrity dat</h1>
+    <p class="lead">Zkontrolujte, že prezentace nebo certifikát, které máte od MMTRADE, jsou originál a nikdo v nich nezměnil ani jeden znak.</p>
+    <div class="meta">
+      <div><span class="k">Číslo certifikátu</span><b id="m-no">—</b></div>
+      <div><span class="k">Vystaveno</span><b id="m-date">—</b></div>
+      <div><span class="k">Převod čísel</span><b id="m-chk" style="color:var(--ok)">—</b></div>
+      <div><span class="k">Git commit zdrojů</span><b id="m-commit">—</b></div>
+    </div>
+  </section>
+
+  <label class="drop" id="drop" for="f">
+    <input type="file" id="f" accept=".pdf,.txt,application/pdf">
+    <strong>Vyberte soubor, který jste dostali</strong>
+    <span>Prezentaci nebo certifikát (PDF), nic jiného nepotřebujete. Na počítači ho můžete sem i přetáhnout.</span>
+    <span class="btn" aria-hidden="true">Vybrat soubor</span>
+    <span class="k" style="letter-spacing:.12em">Soubor se nikam neodesílá · otisk se spočítá ve vašem zařízení</span>
+  </label>
+
+  <section id="res" class="res" hidden aria-live="polite"></section>
+
+  <section class="sheet">
+    <div class="k c">Jak ověření funguje</div>
+    <div class="steps">
+      <div><b>1 · Otisk souboru</b><p>Z každého souboru jde spočítat otisk SHA-256: 64 znaků. Stejný soubor má vždy stejný otisk.</p></div>
+      <div><b>2 · Nejde zfalšovat</b><p>Změní-li se v PDF jediný znak, číslo nebo obrázek, otisk vyjde úplně jiný. Vyrobit upravený soubor se stejným otiskem je prakticky nemožné.</p></div>
+      <div><b>3 · Oficiální registr</b><p>Tato stránka zná oficiální otisky obou dokumentů (stejné jsou vytištěné na straně 1 certifikátu) a porovná s nimi otisk vašeho souboru.</p></div>
+    </div>
+  </section>
+
+  <section class="sheet">
+    <div class="k c">Registr ověřených souborů</div>
+    <div class="tbl"><table><thead><tr><th>Soubor</th><th>SHA-256</th></tr></thead><tbody id="reg"></tbody></table></div>
+    <div style="margin-top:14px"><span class="k">Kořenový otisk zdrojových dat laboratoře (příloha A certifikátu)</span><div class="hash" id="m-root"></div></div>
+  </section>
+
+  <p class="foot">Ověřovací stránka MMTRADE běží odděleně od souborů, které jste dostali, takže ji úprava souboru neovlivní. Certifikát vydává MMTRADE · ověřovatelé: M – MMTRADE, auditor · Claude (AI, Anthropic), ověření převodu čísel přepočtem.</p>
+</main>
+
+<script>
+const CERT = {"cert": "MMT-CI-2026-005", "datum": "22. 11. 2026", "commit": "25beaff1bde4ba6d44cfbcbd6c24141bc8c76773", "checks": 24, "koren": "6c9de9b266340ad8ca24dd0472cbddac068357c66fbf3db2dc6568941d5d1355", "soubory": [{"nazev": "MMTRADE — Investor Deck (22-11-2026 v5).pdf", "druh": "Investor Deck v5 · PDF", "sha": "778cc12aab563fd1eae7dced0ae2af9c9721d4ba7331ac77be84df7c350b7750"}, {"nazev": "MMTRADE — Certifikát integrity dat (22-11-2026 v5).pdf", "druh": "Certifikát integrity dat · PDF", "sha": "e6f1c30f60e12111e8d9db35585310f5717eac1d97ca149aa284ed7a17d7ecb8"}]};
+const $ = id => document.getElementById(id);
+const grp = h => { const g = h.match(/.{8}/g); return `<i>${g[0]}</i> ${g.slice(1,7).join(" ")} <i>${g[7]}</i>`; };
+function fill(){
+  if(!CERT){ $("m-no").textContent = "připravuje se"; return; }
+  $("m-no").textContent = CERT.cert; $("m-date").textContent = CERT.datum;
+  $("m-chk").textContent = `ověřeno ${CERT.checks}/${CERT.checks}`; $("m-commit").textContent = CERT.commit.slice(0,12);
+  $("reg").innerHTML = CERT.soubory.map(s => `<tr><td>${s.nazev}<br><span class="k" style="letter-spacing:.08em">${s.druh}</span></td><td class="m">${grp(s.sha)}</td></tr>`).join("");
+  $("m-root").innerHTML = grp(CERT.koren);
+}
+fill();
+// SHA-256 v čistém JS: záloha, kdyby prohlížeč (soubor otevřený bez internetu) nepustil crypto.subtle
+function sha256js(bytes){
+  const K=new Uint32Array([0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2]);
+  const H=new Uint32Array([0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19]);
+  const n=bytes.length, tot=((n+9+63)>>6)<<6, m=new Uint8Array(tot); m.set(bytes); m[n]=0x80;
+  const dv=new DataView(m.buffer); dv.setUint32(tot-4,(n*8)>>>0); dv.setUint32(tot-8,Math.floor(n/0x20000000));
+  const w=new Uint32Array(64); const r=(x,k)=>(x>>>k)|(x<<(32-k));
+  for(let o=0;o<tot;o+=64){
+    for(let i=0;i<16;i++) w[i]=dv.getUint32(o+i*4);
+    for(let i=16;i<64;i++){const a=w[i-15],b=w[i-2]; w[i]=(w[i-16]+(r(a,7)^r(a,18)^(a>>>3))+w[i-7]+(r(b,17)^r(b,19)^(b>>>10)))>>>0;}
+    let [a,b,c,d,e,f,g,h]=H;
+    for(let i=0;i<64;i++){const t1=(h+(r(e,6)^r(e,11)^r(e,25))+((e&f)^(~e&g))+K[i]+w[i])>>>0, t2=((r(a,2)^r(a,13)^r(a,22))+((a&b)^(a&c)^(b&c)))>>>0; h=g;g=f;f=e;e=(d+t1)>>>0;d=c;c=b;b=a;a=(t1+t2)>>>0;}
+    H[0]+=a;H[1]+=b;H[2]+=c;H[3]+=d;H[4]+=e;H[5]+=f;H[6]+=g;H[7]+=h;
+  }
+  return [...H].map(x=>x.toString(16).padStart(8,"0")).join("");
+}
+async function sha256(file){
+  const buf = await file.arrayBuffer();
+  if (window.crypto && crypto.subtle) {
+    try { const d = await crypto.subtle.digest("SHA-256", buf); return [...new Uint8Array(d)].map(b => b.toString(16).padStart(2,"0")).join(""); } catch(e) {}
+  }
+  return sha256js(new Uint8Array(buf));
+}
+function esc(s){ return s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+async function check(file){
+  const r = $("res"); r.hidden = false; r.className = "res"; r.innerHTML = `<div class="v" style="color:var(--fg2)">Počítám otisk…</div>`;
+  try{
+    const h = await sha256(file);
+    const hit = CERT && CERT.soubory.find(s => s.sha === h);
+    if(hit){
+      r.className = "res ok";
+      r.innerHTML = `<div class="v">✓ ORIGINÁL · NEZMĚNĚNO</div><p><b>${esc(file.name)}</b> se shoduje se souborem <b>${hit.nazev}</b> v certifikátu ${CERT.cert}. Obsah je přesně ten, který MMTRADE vydal.</p><div class="hash">${grp(h)}</div>`;
+    } else {
+      r.className = "res bad";
+      r.innerHTML = `<div class="v">✗ NESHODUJE SE</div><p><b>${esc(file.name)}</b> není v registru certifikátu. Soubor byl upraven, poškozen při přenosu, nebo jde o jinou verzi. Vyžádejte si originál přímo od MMTRADE.</p><div class="hash">${grp(h)}</div>`;
+    }
+  }catch(e){
+    r.className = "res bad";
+    r.innerHTML = `<div class="v">Soubor nejde přečíst</div><p>Zkuste ho vybrat znovu. Pokud je v e-mailu nebo v aplikaci, nejdřív ho uložte do zařízení (Soubory / Stažené).</p>`;
+  }
+  r.scrollIntoView({behavior:"smooth", block:"nearest"});
+}
+$("f").addEventListener("change", e => { const f = e.target.files[0]; if(f) check(f); e.target.value = ""; });
+const dz = $("drop");
+["dragenter","dragover"].forEach(t => dz.addEventListener(t, e => { e.preventDefault(); dz.classList.add("over"); }));
+["dragleave","drop"].forEach(t => dz.addEventListener(t, e => { e.preventDefault(); dz.classList.remove("over"); }));
+dz.addEventListener("drop", e => { const f = e.dataTransfer.files[0]; if(f) check(f); });
+</script>
+
+</body>
+</html>
